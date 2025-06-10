@@ -1,33 +1,27 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import io from "socket.io-client";
+import config from "./config";
 
-// Try to connect to the server, starting with port 5000 and incrementing if needed
+// Connect to the server based on environment
 const connectToServer = () => {
-  let port = 5000;
-  const maxAttempts = 5;
+  console.log(`Connecting to server at: ${config.serverUrl}`);
   
-  const tryConnect = (attempt) => {
-    if (attempt > maxAttempts) {
-      console.error('Failed to connect to server after multiple attempts');
-      return null;
-    }
-    
-    const socketInstance = io(`http://localhost:${port}`, {
-      reconnectionAttempts: 3,
-      timeout: 2000,
-    });
-    
-    socketInstance.on('connect_error', () => {
-      console.log(`Failed to connect on port ${port}, trying port ${port + 1}...`);
-      socketInstance.close();
-      port += 1;
-      return tryConnect(attempt + 1);
-    });
-    
-    return socketInstance;
-  };
+  const socketInstance = io(config.serverUrl, {
+    reconnectionAttempts: 5,
+    timeout: 5000,
+    transports: ['websocket', 'polling']
+  });
   
-  return tryConnect(1);
+  socketInstance.on('connect', () => {
+    console.log('Connected to server successfully!');
+  });
+  
+  socketInstance.on('connect_error', (error) => {
+    console.error('Connection error:', error);
+    console.log('Make sure your server is running at:', config.serverUrl);
+  });
+  
+  return socketInstance;
 };
 
 // Socket.io client with dynamic port

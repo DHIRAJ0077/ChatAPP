@@ -9,7 +9,8 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "server": "node Server/server.cjs"
+    "server": "node Server/server.cjs",
+    "vercel-build": "vite build"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.0.6",

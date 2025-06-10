@@ -4,11 +4,42 @@ const { Server } = require("socket.io");
 
 const app = express();
 const server = http.createServer(app);
+
+// Determine allowed origins based on environment
+const getAllowedOrigins = () => {
+  if (process.env.NODE_ENV === "production") {
+    // In production, use specific origins
+    const origins = [
+      process.env.CLIENT_URL,
+      "https://chat-app-rouge-seven-55.vercel.app",
+      process.env.VERCEL_URL
+    ].filter(Boolean); // Filter out undefined values
+    
+    return origins.length > 0 ? origins : "*";
+  }
+  // In development, allow all origins
+  return "*";
+};
+
 const io = new Server(server, {
   cors: {
-    origin: "*", 
+    origin: getAllowedOrigins(),
     methods: ["GET", "POST"],
+    credentials: true
   },
+});
+
+// Add health check endpoint
+app.get("/", (req, res) => {
+  res.send("Chat server is running");
+});
+
+app.get("/api/health", (req, res) => {
+  res.status(200).send({ 
+    status: "ok",
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || "development"
+  });
 });
 
 // Store user information including online status, typing status, and avatar color
@@ -171,27 +202,15 @@ function generateRandomColor() {
   return colors[Math.floor(Math.random() * colors.length)];
 }
 
-// Try different ports if the default one is in use
-let PORT = 5000;
-const MAX_PORT_ATTEMPTS = 5;
+// Use environment port or default to 5000
+const PORT = process.env.PORT || 5000;
 
-function startServer(attempt = 0) {
-  if (attempt >= MAX_PORT_ATTEMPTS) {
-    console.error(`Failed to start server after ${MAX_PORT_ATTEMPTS} attempts`);
-    return;
-  }
-  
-  server.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-  }).on('error', (err) => {
-    if (err.code === 'EADDRINUSE') {
-      console.log(`Port ${PORT} is in use, trying port ${PORT + 1}...`);
-      PORT += 1;
-      startServer(attempt + 1);
-    } else {
-      console.error('Server error:', err);
-    }
-  });
-}
+// Start the server
+server.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`CORS allowed origins: ${JSON.stringify(getAllowedOrigins())}`);
+});
 
-startServer();
+// Export server components for testing or other uses
+module.exports = { app, server, io };
