@@ -8,19 +8,17 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     assetsDir: 'assets',
-    // Generate source maps for better debugging
     sourcemap: true,
   },
-  // Ensure proper base path for production
-  base: '/',
-  // Optimize dependencies
+  base: "/",
   optimizeDeps: {
     include: ['socket.io-client']
   },
   // Configure server settings
   server: {
-    port: 3000,
-    strictPort: true,
-    host: true
+    port: 3001, // Use port 3001 instead of 3000
+    strictPort: false, // Allow Vite to use another port if 3001 is in use
+    host: true,
+    open: true // Automatically open browser when starting dev server
   }
 })

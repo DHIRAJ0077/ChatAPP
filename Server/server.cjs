@@ -7,21 +7,10 @@ const server = http.createServer(app);
 
 // Determine allowed origins based on environment
 const getAllowedOrigins = () => {
-  if (process.env.NODE_ENV === "production") {
-    // In production, use specific origins
-    const origins = [
-      process.env.CLIENT_URL,
-      "https://chat-app-rouge-seven-55.vercel.app",
-      "https://chat-app-dhiraj0077.vercel.app",
-      "https://chat-app-git-main-dhiraj0077.vercel.app",
-      process.env.VERCEL_URL
-    ].filter(Boolean); // Filter out undefined values
-    
-    console.log("Allowed origins in production:", origins);
-    return origins.length > 0 ? origins : "*";
-  }
-  // In development, allow all origins
-  console.log("Development mode: allowing all origins");
+  // In production, always use wildcard during troubleshooting
+  // This will make sure any frontend can connect
+  // You can restrict this later once everything is working
+  console.log(`Current NODE_ENV: ${process.env.NODE_ENV || 'development'}`);
   return "*";
 };
 
@@ -35,16 +24,18 @@ const io = new Server(server, {
   transports: ['websocket', 'polling']
 });
 
-// Add health check endpoint
+// Add health check endpoints
 app.get("/", (req, res) => {
   res.send("Chat server is running");
 });
 
 app.get("/api/health", (req, res) => {
-  res.status(200).send({ 
+  res.status(200).json({
     status: "ok",
     timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || "development"
+    environment: process.env.NODE_ENV || "development",
+    uptime: process.uptime(),
+    version: "1.0.1"
   });
 });
 

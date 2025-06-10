@@ -4,6 +4,12 @@ services:
     env: node
     buildCommand: npm install
     startCommand: node Server/server.cjs
+    plan: free # Specify the plan (free or paid)
     envVars:
       - key: NODE_ENV
         value: production
+      - key: PORT
+        value: 5000
+    healthCheckPath: /api/health # Add health check path
+    # Configure for WebSocket support
+    websocket: true

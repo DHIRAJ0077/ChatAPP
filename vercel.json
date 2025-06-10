@@ -10,7 +10,7 @@
     { "src": "/(.*)", "dest": "/index.html" }
   ],
   "env": {
-    "VITE_SERVER_URL": "https://chat-app-server.onrender.com"
+    "VITE_SERVER_URL": "https://chat-app-server-nacx.onrender.com"
   },
   "headers": [
     {
