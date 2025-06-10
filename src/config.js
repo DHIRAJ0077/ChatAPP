@@ -2,6 +2,7 @@
 const getServerUrl = () => {
   // Check for environment variable first (set in vercel.json)
   if (import.meta.env.VITE_SERVER_URL) {
+    console.log('Using environment variable for server URL:', import.meta.env.VITE_SERVER_URL);
     return import.meta.env.VITE_SERVER_URL;
   }
   
@@ -20,10 +21,18 @@ const getServerUrl = () => {
   
   // Determine which environment we're in
   const environment = import.meta.env.MODE || 'development';
+  console.log('Current environment:', environment);
+  console.log('Using server URL:', config[environment].serverUrl);
   return config[environment].serverUrl;
 };
 
 // Export the configuration
-export default {
-  serverUrl: getServerUrl()
+const serverConfig = {
+  serverUrl: getServerUrl(),
+  version: '1.0.1', // Add version for debugging
+  timestamp: new Date().toISOString()
 };
+
+console.log('Server configuration:', serverConfig);
+
+export default serverConfig;

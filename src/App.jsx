@@ -5,20 +5,41 @@ import config from "./config";
 // Connect to the server based on environment
 const connectToServer = () => {
   console.log(`Connecting to server at: ${config.serverUrl}`);
+  console.log('Connection config:', config);
   
-  const socketInstance = io(config.serverUrl, {
+  // Add timestamp to URL to avoid caching issues
+  const connectionUrl = `${config.serverUrl}?t=${Date.now()}`;
+  
+  const socketOptions = {
     reconnectionAttempts: 5,
-    timeout: 5000,
-    transports: ['websocket', 'polling']
-  });
+    timeout: 10000, // Increased timeout
+    transports: ['websocket', 'polling'],
+    forceNew: true,
+    reconnectionDelay: 2000,
+    reconnectionDelayMax: 5000
+  };
+  
+  console.log('Socket.IO connection options:', socketOptions);
+  
+  const socketInstance = io(connectionUrl, socketOptions);
   
   socketInstance.on('connect', () => {
     console.log('Connected to server successfully!');
+    console.log('Socket ID:', socketInstance.id);
   });
   
   socketInstance.on('connect_error', (error) => {
     console.error('Connection error:', error);
+    console.log('Error details:', error.message);
     console.log('Make sure your server is running at:', config.serverUrl);
+  });
+  
+  socketInstance.on('disconnect', (reason) => {
+    console.log('Disconnected from server. Reason:', reason);
+  });
+  
+  socketInstance.on('reconnect_attempt', (attemptNumber) => {
+    console.log(`Reconnection attempt ${attemptNumber}...`);
   });
   
   return socketInstance;

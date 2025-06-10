@@ -12,21 +12,27 @@ const getAllowedOrigins = () => {
     const origins = [
       process.env.CLIENT_URL,
       "https://chat-app-rouge-seven-55.vercel.app",
+      "https://chat-app-dhiraj0077.vercel.app",
+      "https://chat-app-git-main-dhiraj0077.vercel.app",
       process.env.VERCEL_URL
     ].filter(Boolean); // Filter out undefined values
     
+    console.log("Allowed origins in production:", origins);
     return origins.length > 0 ? origins : "*";
   }
   // In development, allow all origins
+  console.log("Development mode: allowing all origins");
   return "*";
 };
 
 const io = new Server(server, {
   cors: {
-    origin: getAllowedOrigins(),
-    methods: ["GET", "POST"],
-    credentials: true
+    origin: "*", // Allow all origins during troubleshooting
+    methods: ["GET", "POST", "OPTIONS"],
+    credentials: true,
+    allowedHeaders: ["Content-Type", "Authorization"]
   },
+  transports: ['websocket', 'polling']
 });
 
 // Add health check endpoint
