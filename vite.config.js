@@ -9,6 +9,7 @@ export default defineConfig({
     outDir: 'dist',
     assetsDir: 'assets',
     sourcemap: true,
+    chunkSizeWarningLimit: 1200, // Increase from default 500kb to 1200kb
   },
   base: "/",
   optimizeDeps: {
